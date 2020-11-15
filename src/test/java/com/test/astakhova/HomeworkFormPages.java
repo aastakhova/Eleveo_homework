@@ -1,11 +1,9 @@
 package com.test.astakhova;
 import org.junit.Assert;
-import org.openqa.selenium.By;
-import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.*;
 import java.util.List;
 
 public class HomeworkFormPages {
@@ -15,7 +13,18 @@ public class HomeworkFormPages {
         this.driver = driver;
     }
 
-    @FindBy(css="div[aria-label='Check this'] div[class$='exportInnerBox']")
+    public void waitForLoad() {
+        ExpectedCondition<Boolean> pageLoadCondition = new
+                ExpectedCondition<Boolean>() {
+                    public Boolean apply(WebDriver driver) {
+                        return ((JavascriptExecutor)driver).executeScript("return document.readyState").equals("complete");
+                    }
+                };
+        WebDriverWait wait = new WebDriverWait(driver, 30);
+        wait.until(pageLoadCondition);
+    }
+
+    @FindBy(css="div[data-params*='Check that'] div[aria-label='Check this']")
     private List<WebElement> checkThisCbs;
     public void clickCheckThisCbs() {
         for (WebElement i : checkThisCbs){
@@ -23,13 +32,13 @@ public class HomeworkFormPages {
         }
     }
 
-    @FindBy(css="input[type='date']")
+    @FindBy(css="div[data-params*='Select date'] input")
     private WebElement dateField;
     public void setDate(String date){
         dateField.sendKeys(date);
     }
 
-    @FindBy(css="span.appsMaterialWizButtonPaperbuttonLabel")
+    @FindBy(css="div[class*=appsMaterialWizButtonEl")
     private List<WebElement> nextBackBtn;
     public void clickNextButton() {
         if (nextBackBtn.size() == 1) {
@@ -38,6 +47,7 @@ public class HomeworkFormPages {
         else {
             nextBackBtn.get(1).click();
         }
+        waitForLoad();
     }
 
     public void clickBackButton(){
@@ -48,9 +58,10 @@ public class HomeworkFormPages {
         nextBackBtn.get(1).click();
     }
 
-    @FindBy(css="div.freebirdFormviewerComponentsQuestionBaseErrorIcon")
+    @FindBy(css="div[data-params*='current month'] div.freebirdFormviewerComponentsQuestionBaseValidationError")
     private WebElement warningMsg;
     public boolean warningIsDisplayed(){
+        waitForLoad();
         try {
             return warningMsg.isDisplayed();
         }
@@ -64,6 +75,9 @@ public class HomeworkFormPages {
     public void setMonth(String month){
         currentMonthFld.clear();
         currentMonthFld.sendKeys(month);
+        new WebDriverWait(driver, 10)
+                .until(ExpectedConditions.invisibilityOfElementLocated(
+                        By.cssSelector("div.freebirdFormviewerComponentsQuestionBaseErrorIcon")));
     }
 
     public String getSetMonth(){
