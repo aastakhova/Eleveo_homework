@@ -5,6 +5,8 @@ import org.junit.Test;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.junit.BeforeClass;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.ie.InternetExplorerDriver;
 
 import java.util.concurrent.TimeUnit;
 
@@ -13,8 +15,24 @@ public class HomeworkFormCheck {
     public static HomeworkFormPages formPage;
     @BeforeClass
     public static void setup() {
-        System.setProperty("webdriver.chrome.driver", ConfProperties.getProperty("chromedriver"));
-        driver = new ChromeDriver();
+        String browser = System.getProperty("browser");
+        System.out.println(browser);
+        switch (browser) {
+            case "chrome":
+                System.setProperty("webdriver.chrome.driver", ConfProperties.getProperty("chromedriver"));
+                driver = new ChromeDriver();
+                break;
+            case "firefox":
+                System.setProperty("webdriver.gecko.driver", ConfProperties.getProperty("firefoxdriver"));
+                driver = new FirefoxDriver();
+                break;
+            case "ie":
+                System.setProperty("webdriver.ie.driver", ConfProperties.getProperty("iedriver"));
+                driver = new InternetExplorerDriver();
+                break;
+            default:
+                Assert.fail("Unknown browser.");
+        }
         driver.get(ConfProperties.getProperty("login_page"));
         driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
     }
